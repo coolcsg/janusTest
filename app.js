@@ -106,16 +106,10 @@ async function createChatScreen(roomId, uid) {
             snapshot.forEach((chat) => {
                 let data = chat.data();
                 if (data.message) {
-                    // console.log(data.message);
-                    // 내 메세지는 오른쪽이며 노란색
-                    // 상대방 메세지는 왼쪽이며 흰색..
-                    // 문서가 변화할때만 추가
                     var span = document.createElement('span');
                     if (data.name === uid) {
-                        // console.log('i can talk!!');
                         span.style = 'display: inline-block; width: 95%; text-align: right; margin-right : 10px';
                     } else {
-                        // console.log("it's other talks");
                         span.style = 'display: inline-block; width: 95%; text-align: left; margin-left : 20px';
                     }
                     span.appendChild(document.createTextNode(data.message));
@@ -136,12 +130,9 @@ async function createRoom() {
 } //-------------------------------------------- creating Room
 
 async function getUid(callback) {
-    // 콜백함수로 user id가 존재할때만 방 생성하게끔 수정...
-    // async await 코드 연습, async 함수를 호출해서 await 키워드를 붙여 쓰는 것이 가능
     firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
             callback(user.uid);
-            console.log('내 아이디는 ' + user.uid);
             return user.uid;
         } else {
             alert('접속이 되지 않았습니다! ');
@@ -253,20 +244,6 @@ async function createRoomAfterUidInitialize(uid, roomsCol, roomId) {
                         },
                     };
                     videoroomPluginHandle.send(joinmsg);
-                    // var body = { audio: true, video: true };
-                    // videoroomPluginHandle.createOffer({
-                    //     success: function (jsep) {
-                    //         videoroomPluginHandle.send({ message: body, jsep: jsep });
-                    //     },
-                    //     error: function (error) {
-                    //         Janus.debug(error);
-                    //     },
-                    //     customizeSdp: function (jsep) {
-                    //         // if you want to modify the original sdp, do as the following
-                    //         // oldSdp = jsep.sdp;
-                    //         // jsep.sdp = yourNewSdp;
-                    //     },
-                    // });
                 },
                 error: function (error) {
                     console.log(error);
@@ -299,14 +276,9 @@ async function createRoomAfterUidInitialize(uid, roomsCol, roomId) {
 
                             if (subscriber_mode) {
                                 console.log('subscriber_mode' + subscriber_mode);
-                                // $('#videojoin').hide();
-                                // $('#videos').removeClass('hide').show();
-                                // 방에 성공적으로 들어오게 되면 수행하는 곳인듯
-                                // publishOwnFeed(true);
                             } else {
                                 console.log('subscriber_mode' + subscriber_mode);
                                 console.log('videoroomPluginHandle', videoroomPluginHandle);
-                                // 내 stream을 publish 하는 부분 ---------------------------------------------------- !!!
                                 publishOwnFeed(true);
                             }
 
@@ -408,17 +380,6 @@ async function createRoomAfterUidInitialize(uid, roomsCol, roomId) {
                                 Janus.debug(error);
                             },
                         });
-                        // videoroomPluginHandle.createAnswer({
-                        //     jsep: jsep,
-                        //     media: { audioSend: true, videoSend: true },
-                        //     success: function (ourjsep) {
-                        //         var body = { request: 'start' };
-                        //         videoroomPluginHandle.send({ message: body, jsep: ourjsep });
-                        //     },
-                        //     error: function (error) {
-                        //         Janus.debug(error);
-                        //     },
-                        // });
 
                         var audio = msg['audio_codec'];
                         if (mystream && mystream.getAudioTracks() && mystream.getAudioTracks().length > 0 && !audio) {
@@ -455,19 +416,13 @@ async function createRoomAfterUidInitialize(uid, roomsCol, roomId) {
                     }
                 },
                 oncleanup: function () {
-                    // 일정 시간이 지나면 cleanup 메세지가 날라옴 확인 필요..
                     Janus.log(' ::: Got a cleanup notification: we are unpublished now :::');
                     // mystream = null;
-                    // $('#videos').html('<button id="publish" class="btn btn-primary">Publish</button>');
-                    // $('#publish').click(function () {
-                    //     publishOwnFeed(true);
-                    // });
                 },
             };
             janusSesseion.attach(callbacks);
         },
         error: function (error) {
-            // Janus.error(error);
             console.log('gatewayCallback : ' + error);
         },
         destroyed: function () {
@@ -514,8 +469,6 @@ async function joinRoomAfterUid(uid) {
                         console.log('uidList update : ', uidList);
                     });
 
-                    // peers들의 숫자를 세서 숫자만큼 video 태그를 추가해야 한다.
-                    // uidList에서 unique한 값들만 뽑는다.
                     let uniqueUids = [...new Set(uidList)];
                     uniqueUids.forEach((id) => {
                         if (id !== uid) {
@@ -544,7 +497,6 @@ async function joinRoomAfterUid(uid) {
 }
 
 async function joinRoomById(uid, roomId, id) {
-    //other uid 정보를 받아서 peer를 생성하자.
     const roomsRoomIdMyIdCollection = await roomsRoomIdDoc.collection(uid);
     connectPeer(uid, id, roomsRoomIdMyIdCollection, roomId);
 }
@@ -570,7 +522,6 @@ async function connectPeer(uid, id, roomsRoomIdMyIdCollection, roomId) {
                         ptype: 'publisher',
                         // ptype: 'subscriber',
                         display: uid,
-                        // id: parseInt(uidNum), // id도 positive integer이어야 함
                         pin: null,
                     };
                     videoroomPluginHandle.send({ message: msg });
@@ -600,17 +551,12 @@ async function connectPeer(uid, id, roomsRoomIdMyIdCollection, roomId) {
                             mypvtid = msg['private_id'];
                             Janus.log('Successfully joined room ' + msg['room'] + ' with ID ' + myid);
 
-                            // 누가 조인했으니 비디오 태그 생성하자 ... >> firebase로 생성..완료
 
                             if (subscriber_mode) {
                                 console.log('subscriber_mode' + subscriber_mode);
-                                // $('#videojoin').hide();
-                                // $('#videos').removeClass('hide').show();
-                                // 방에 성공적으로 들어오게 되면 수행하는 곳인듯
                             } else {
                                 console.log('subscriber_mode' + subscriber_mode);
                                 console.log('videoroomPluginHandle', videoroomPluginHandle);
-                                // 내 stream을 publish 하는 부분 ---------------------------------------------------- !!!
                                 publishOwnFeed(true);
                             }
 
@@ -755,11 +701,6 @@ async function connectPeer(uid, id, roomsRoomIdMyIdCollection, roomId) {
                 },
                 oncleanup: function () {
                     Janus.log(' ::: Got a cleanup notification: we are unpublished now :::');
-                    // mystream = null;
-                    // $('#videos').html('<button id="publish" class="btn btn-primary">Publish</button>');
-                    // $('#publish').click(function () {
-                    //     publishOwnFeed(true);
-                    // });
                 },
             };
             janusSesseion.attach(callbacks);
@@ -824,22 +765,18 @@ async function hangUp(e) {
 
 function registerPeerConnectionListeners() {
     peerConnection.addEventListener('icegatheringstatechange', () => {
-        //  이이벤트는 ICE 에이전트가 ICE candidate를 수집을 하는지의 여부를 알려주는 ICE 수집 상태가 변하면 발생합니다.
         console.log(`ICE gathering state changed: ${peerConnection.iceGatheringState}`);
     });
 
     peerConnection.addEventListener('connectionstatechange', () => {
-        // 이 이벤트는  연결의 상태 집합체가 변할 때마다 발생합니다. 이 상태 집합체는 연결에 의해 사용되는 각각의 네트워크 전송 상태들의 묶음입니다.
         console.log(`Connection state change: ${peerConnection.connectionState}`);
     });
 
     peerConnection.addEventListener('signalingstatechange', () => {
-        //  function to be called when the signalingstatechange event occurs on an RTCPeerConnection interface.
         console.log(`Signaling state change: ${peerConnection.signalingState}`);
     });
 
     peerConnection.addEventListener('iceconnectionstatechange ', () => {
-        //연결이 끊기는 상황과 같이 ICE 연결의 상태가 변하게되면 RTCPeerConnection에 전달합니다.
         console.log(`ICE connection state change: ${peerConnection.iceConnectionState}`);
     });
 }
@@ -941,8 +878,6 @@ function newRemoteFeed(id, display, audio, video, roomId) {
                 // Answer and attach
                 videoroomPluginHandle.createAnswer({
                     jsep: jsep,
-                    // Add data:true here if you want to subscribe to datachannels as well
-                    // (obviously only works if the publisher offered them in the first place)
                     media: { audioSend: false, videoSend: false }, // We want recvonly audio/video
                     success: function (jsep) {
                         Janus.debug('Got SDP!', jsep);
@@ -968,97 +903,8 @@ function newRemoteFeed(id, display, audio, video, roomId) {
         },
         onremotestream: function (stream) {
             Janus.debug('Remote feed #' + videoroomPluginHandle.rfindex + ', stream:', stream);
-            // var addButtons = false;
-            // if ($('#remotevideo' + videoroomPluginHandle.rfindex).length === 0) {
-            //     addButtons = true;
-            //     // No remote video yet
-            //     $('#videoremote' + videoroomPluginHandle.rfindex).append(
-            //         '<video class="rounded centered" id="waitingvideo' + videoroomPluginHandle.rfindex + '" width="100%" height="100%" />'
-            //     );
-            //     $('#videoremote' + videoroomPluginHandle.rfindex).append(
-            //         '<video class="rounded centered relative hide" id="remotevideo' +
-            //             videoroomPluginHandle.rfindex +
-            //             '" width="100%" height="100%" autoplay playsinline/>'
-            //     );
-            //     $('#videoremote' + videoroomPluginHandle.rfindex).append(
-            //         '<span class="label label-primary hide" id="curres' +
-            //             videoroomPluginHandle.rfindex +
-            //             '" style="position: absolute; bottom: 0px; left: 0px; margin: 15px;"></span>' +
-            //             '<span class="label label-info hide" id="curbitrate' +
-            //             videoroomPluginHandle.rfindex +
-            //             '" style="position: absolute; bottom: 0px; right: 0px; margin: 15px;"></span>'
-            //     );
-            //     // Show the video, hide the spinner and show the resolution when we get a playing event
-            //     $('#remotevideo' + videoroomPluginHandle.rfindex).bind('playing', function () {
-            //         if (videoroomPluginHandle.spinner) videoroomPluginHandle.spinner.stop();
-            //         videoroomPluginHandle.spinner = null;
-            //         $('#waitingvideo' + videoroomPluginHandle.rfindex).remove();
-            //         if (this.videoWidth)
-            //             $('#remotevideo' + videoroomPluginHandle.rfindex)
-            //                 .removeClass('hide')
-            //                 .show();
-            //         var width = this.videoWidth;
-            //         var height = this.videoHeight;
-            //         $('#curres' + videoroomPluginHandle.rfindex)
-            //             .removeClass('hide')
-            //             .text(width + 'x' + height)
-            //             .show();
-            //         if (Janus.webRTCAdapter.browserDetails.browser === 'firefox') {
-            //             // Firefox Stable has a bug: width and height are not immediately available after a playing
-            //             setTimeout(function () {
-            //                 var width = $('#remotevideo' + videoroomPluginHandle.rfindex).get(0).videoWidth;
-            //                 var height = $('#remotevideo' + videoroomPluginHandle.rfindex).get(0).videoHeight;
-            //                 $('#curres' + videoroomPluginHandle.rfindex)
-            //                     .removeClass('hide')
-            //                     .text(width + 'x' + height)
-            //                     .show();
-            //             }, 2000);
-            //         }
-            //     });
-            // }
-            // Janus.attachMediaStream($('#remotevideo' + videoroomPluginHandle.rfindex).get(0), stream);
             Janus.attachMediaStream($('#remoteVideo').get(0), stream);
             var videoTracks = stream.getVideoTracks();
-            // if (!videoTracks || videoTracks.length === 0) {
-            //     // No remote video
-            //     $('#remotevideo' + videoroomPluginHandle.rfindex).hide();
-            //     if ($('#videoremote' + videoroomPluginHandle.rfindex + ' .no-video-container').length === 0) {
-            //         $('#videoremote' + videoroomPluginHandle.rfindex).append(
-            //             '<div class="no-video-container">' +
-            //                 '<i class="fa fa-video-camera fa-5 no-video-icon"></i>' +
-            //                 '<span class="no-video-text">No remote video available</span>' +
-            //                 '</div>'
-            //         );
-            //     }
-            // } else {
-            //     $('#videoremote' + videoroomPluginHandle.rfindex + ' .no-video-container').remove();
-            //     $('#remotevideo' + videoroomPluginHandle.rfindex)
-            //         .removeClass('hide')
-            //         .show();
-            // }
-            // if (!addButtons) return;
-            // if (
-            //     Janus.webRTCAdapter.browserDetails.browser === 'chrome' ||
-            //     Janus.webRTCAdapter.browserDetails.browser === 'firefox' ||
-            //     Janus.webRTCAdapter.browserDetails.browser === 'safari'
-            // ) {
-            //     $('#curbitrate' + videoroomPluginHandle.rfindex)
-            //         .removeClass('hide')
-            //         .show();
-            //     bitrateTimer[videoroomPluginHandle.rfindex] = setInterval(function () {
-            //         // Display updated bitrate, if supported
-            //         var bitrate = videoroomPluginHandle.getBitrate();
-            //         $('#curbitrate' + videoroomPluginHandle.rfindex).text(bitrate);
-            //         // Check if the resolution changed too
-            //         var width = $('#remotevideo' + videoroomPluginHandle.rfindex).get(0).videoWidth;
-            //         var height = $('#remotevideo' + videoroomPluginHandle.rfindex).get(0).videoHeight;
-            //         if (width > 0 && height > 0)
-            //             $('#curres' + videoroomPluginHandle.rfindex)
-            //                 .removeClass('hide')
-            //                 .text(width + 'x' + height)
-            //                 .show();
-            //     }, 1000);
-            // }
         },
         oncleanup: function () {
             Janus.log(' ::: Got a cleanup notification (remote feed ' + id + ') :::');
@@ -1083,25 +929,12 @@ function publishOwnFeed(useAudio) {
     videoroomPluginHandle.createOffer({
         // Add data:true here if you want to publish datachannels as well
         media: { audioRecv: false, videoRecv: false, audioSend: useAudio, videoSend: true }, // Publishers are sendonly
-        // If you want to test simulcasting (Chrome and Firefox only), then
-        // pass a ?simulcast=true when opening this demo page: it will turn
-        // the following 'simulcast' property to pass to janusSesseion.js to true
         simulcast: doSimulcast,
         simulcast2: doSimulcast2,
         success: function (jsep) {
             Janus.debug('Got publisher SDP!', jsep);
             let bitrate = 200 * 300;
             var publish = { request: 'configure', audio: useAudio, video: true, bitrate: bitrate };
-            // 게시 할 때 특정 코덱을 사용하도록 강제 할 수 있습니다.
-            // audiocodec 및 videocodec 속성, 예 :
-            // publish [ "audiocodec"] = "opus"
-            // Opus를 오디오 코덱으로 사용하거나 다음을 수행합니다.
-            // publish [ "videocodec"] = "vp9"
-            // 사용할 비디오 코덱으로 VP9를 강제합니다. 그러나 두 경우 모두 강제
-            // 코덱은 다음 경우에만 작동합니다. (1) 코덱이 실제로 SDP에있는 경우 (및
-            // 브라우저가 지원), (2) 코덱이 목록에 있습니다.
-            // 방에 코덱을 허용했습니다. 위의 (2) 점과 관련하여,
-            // 자세한 내용은 janus.plugin.videoroom.jcfg의 텍스트를 참조하십시오.
             videoroomPluginHandle.send({ message: publish, jsep: jsep });
         },
         error: function (error) {
@@ -1111,11 +944,6 @@ function publishOwnFeed(useAudio) {
                 publishOwnFeed(false);
             } else {
                 console.log('WebRTC error... ' + error.message);
-                // $('#publish')
-                //     .removeAttr('disabled')
-                //     .click(function () {
-                //         publishOwnFeed(true);
-                //     });
             }
         },
     });

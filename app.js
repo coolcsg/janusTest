@@ -236,8 +236,7 @@ async function createRoomAfterUidInitialize(uid, roomsCol, roomId) {
     var gatewayCallback = {
         server: server,
 
-        iceServers: [
-            { urls: 'turns:turn.112.161.122.2:3478?transport=tcp', username: 'shareemotion', credential: '111211' },
+        iceServers: [            
             { urls: 'stun:stun1.l.google.com:19302' },
             { urls: 'stun:stun2.l.google.com:19302' },
         ],

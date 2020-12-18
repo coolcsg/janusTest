@@ -1,30 +1,8 @@
 mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
 
-// const server = 'http://' + '34.64.240.242:8088' + '/janus'; // GCP로 만든 Janus 서버
-// const server = 'https://www.happylecture.net:8088/janus'
-// const server = 'https://happylecture.net:8088';
-const server = 'https://happylecture.net:8088/janus';
-// const server = 'http://happylecture.net:8088/janus';
-
 const LOGGINPAGE = 'https://firwebrtc.firebaseapp.com/log';
 
-// DEfault configuration - Change these if you have a different STUN or TURN server.
-// const configuration = {
-//     iceServers: [
-//         { url: 'stun:stun1.l.google.com:19302' },
-//         { url: 'stun:stun2.l.google.com:19302' },
-//         { url: 'turn:turn.112.161.122.2:3478', username: 'shareemotion', credential: '111211' },
-//         // { url: 'turn:turn.112.161.122.2:5349', username: 'shareemotion', credential: '111211' },
-//         // {
-//         //     url: 'turn:numb.viagenie.ca',
-//         //     credential: 'muazkh',
-//         //     username: 'webrtc@live.com',
-//         // },
-//     ],
-//     iceCandidatePoolSize: 10,
-// };
 
-// let peerConnection = null; // 같은 peerConnection에 과 setRemote를 해야 하는 건가??? 당연하겠지...
 let localStream = null;
 // let remoteStream = null;
 let roomDialog = null;
